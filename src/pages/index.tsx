@@ -670,15 +670,27 @@ const HomePage = () => {
                   
                   {/* Center Blue Box - Always present in this view */}
                   <motion.div
-                    className="bg-dropbox-blue text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[520px] h-[520px] flex flex-col justify-between p-6"
+                    className="bg-dropbox-blue text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[520px] h-[520px] flex flex-col justify-between p-6 rounded-lg"
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.5, opacity: 0 }}
-                    transition={{ duration: 0.5 }}
+                    exit={{ 
+                      scale: transitionPhase === 3 ? 0.9 : 0.5, 
+                      opacity: transitionPhase === 3 ? 0.5 : 0,
+                      x: transitionPhase === 3 ? 0 : undefined,
+                      y: transitionPhase === 3 ? 0 : undefined,
+                      top: transitionPhase === 3 ? "50%" : undefined,
+                      left: transitionPhase === 3 ? "50%" : undefined
+                    }}
+                    transition={{ 
+                      duration: 0.5,
+                      type: "spring",
+                      stiffness: 200
+                    }}
                     style={{
                       gridColumn: "2 / span 2",
                       gridRow: "2 / span 2",
                     }}
+                    layoutId={transitionPhase === 3 ? "color-card" : undefined}
                   >
                     <motion.h2
                       className="text-xl md:text-2xl font-bold"
@@ -823,6 +835,7 @@ const HomePage = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
                     whileHover={{ scale: 0.98 }}
+                    layoutId="color-card"
                   >
                     <h3 className="text-xl font-bold">Color</h3>
                     <div className="flex-1 flex items-end justify-end">
@@ -907,7 +920,7 @@ const HomePage = () => {
                 {/* Imagery Card */}
                 <Link href="/#imagery" className="block" style={{ gridArea: "imagery" }}>
                   <motion.div 
-                    className="bg-[#9C366B] text-white h-full w-full p-6 flex flex-col"
+                    className="bg-[#9C366B] text-white h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.4 }}
