@@ -17,41 +17,6 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Animation variants
-  const headerVariants = {
-    initial: { 
-      backgroundColor: 'rgba(255, 255, 255, 0)'
-    },
-    scrolled: { 
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-    }
-  };
-
-  const logoVariants = {
-    initial: { 
-      color: '#ffffff',
-      scale: 1.2
-    },
-    scrolled: { 
-      color: '#0061FF',
-      scale: 1
-    }
-  };
-
-  const navLinkVariants = {
-    initial: { 
-      color: '#ffffff'
-    },
-    scrolled: { 
-      color: '#637282'
-    },
-    hover: {
-      color: isScrolled ? '#1E1919' : '#ffffff',
-      y: -2
-    }
-  };
-
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
     // Prevent scrolling when menu is open
@@ -64,70 +29,104 @@ const Header = () => {
 
   return (
     <motion.header 
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-3' : 'py-5'}`}
-      initial="initial"
-      animate={isScrolled ? "scrolled" : "initial"}
-      variants={headerVariants}
+      className="fixed top-0 left-0 w-full z-50 py-4 bg-white border-b border-gray-100"
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5 }}
     >
-      <div className="container-custom mx-auto flex items-center justify-between">
+      <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
-        <motion.div 
-          className="flex items-center"
-          variants={logoVariants}
-        >
+        <div className="flex items-center">
           <Link href="/" className="flex items-center">
-            <svg width="40" height="40" viewBox="0 0 40 40" fill="currentColor">
+            <svg 
+              width="36" 
+              height="36" 
+              viewBox="0 0 40 40" 
+              className="text-dropbox-blue"
+              fill="currentColor"
+            >
               <path d="M12.5 2.5L2.5 12.5V25L12.5 15V2.5Z" />
               <path d="M27.5 2.5L37.5 12.5V25L27.5 15V2.5Z" />
               <path d="M12.5 37.5L2.5 27.5V15L12.5 25V37.5Z" />
               <path d="M27.5 37.5L37.5 27.5V15L27.5 25V37.5Z" />
             </svg>
-            <span className="ml-2 text-xl font-bold">Dropbox Brand</span>
+            <span className="ml-2 text-xl font-bold text-dropbox-blue">
+              Dropbox Brand
+            </span>
           </Link>
-        </motion.div>
+        </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          {['Brand', 'Products', 'Resources', 'Guidelines'].map((item) => (
-            <motion.div key={item} variants={navLinkVariants} whileHover="hover">
-              <Link href={`/#${item.toLowerCase()}`} className="font-medium">
-                {item}
-              </Link>
-            </motion.div>
-          ))}
-          <motion.div variants={navLinkVariants} whileHover="hover">
-            <a 
-              href="/#contact" 
-              className={`btn ${isScrolled ? 'btn-primary' : 'bg-white text-dropbox-blue'}`}
-            >
-              Contact
-            </a>
-          </motion.div>
+        <nav className="hidden md:flex items-center space-x-6">
+          <Link 
+            href="/#framework" 
+            className="text-gray-600 hover:text-dropbox-blue transition-colors duration-200"
+          >
+            Framework
+          </Link>
+          <Link 
+            href="/#logo" 
+            className="text-gray-600 hover:text-dropbox-blue transition-colors duration-200"
+          >
+            Logo
+          </Link>
+          <Link 
+            href="/#color" 
+            className="text-gray-600 hover:text-dropbox-blue transition-colors duration-200"
+          >
+            Color
+          </Link>
+          <Link 
+            href="/#typography" 
+            className="text-gray-600 hover:text-dropbox-blue transition-colors duration-200"
+          >
+            Typography
+          </Link>
+          <Link 
+            href="/#imagery" 
+            className="text-gray-600 hover:text-dropbox-blue transition-colors duration-200"
+          >
+            Imagery
+          </Link>
+          <motion.a 
+            href="https://dropbox.com" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-4 px-4 py-2 rounded bg-dropbox-blue text-white font-medium text-sm hover:bg-dropbox-hover-blue transition-colors duration-200"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Dropbox.com
+          </motion.a>
         </nav>
 
         {/* Mobile menu button */}
         <div className="md:hidden">
           <button 
             onClick={toggleMobileMenu}
-            className="p-2 focus:outline-none"
+            className="p-2 focus:outline-none text-gray-600"
             aria-label="Toggle mobile menu"
           >
-            <motion.div
-              initial={false}
-              animate={isMobileMenuOpen ? "open" : "closed"}
+            <svg 
+              width="24" 
+              height="24" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isScrolled ? "#1E1919" : "#FFFFFF"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                {isMobileMenuOpen ? (
-                  <path d="M18 6L6 18M6 6l12 12" />
-                ) : (
-                  <>
-                    <path d="M3 12h18" />
-                    <path d="M3 6h18" />
-                    <path d="M3 18h18" />
-                  </>
-                )}
-              </svg>
-            </motion.div>
+              {isMobileMenuOpen ? (
+                <path d="M18 6L6 18M6 6l12 12" />
+              ) : (
+                <>
+                  <path d="M3 12h18" />
+                  <path d="M3 6h18" />
+                  <path d="M3 18h18" />
+                </>
+              )}
+            </svg>
           </button>
         </div>
       </div>
