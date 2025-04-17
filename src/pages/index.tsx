@@ -6,12 +6,133 @@ import Footer from '@/components/Layout/Footer';
 
 const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [currentViewIndex, setCurrentViewIndex] = useState(2); // Start with final grid to debug positioning
+  const [currentViewIndex, setCurrentViewIndex] = useState(0); // Start with first view
   const [isScrolling, setIsScrolling] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
+  const [transitionPhase, setTransitionPhase] = useState(0);
   
-  // For keyboard navigation
+  // For the intermediate view with appearing colored boxes
+  const [showColoredBoxes, setShowColoredBoxes] = useState({
+    orange: false,
+    blue: false,
+    cyan: false,
+    yellow: false,
+  });
+  
+  // Scroll and wheel event handlers
   useEffect(() => {
+    const wheelHandler = (e: WheelEvent) => {
+      if (isScrolling) return;
+      e.preventDefault();
+      
+      setIsScrolling(true);
+      setTimeout(() => setIsScrolling(false), 400);
+      
+      if (e.deltaY > 0) {
+        // Scrolling down
+        if (currentViewIndex === 0) {
+          setCurrentViewIndex(1); // Go to blue box
+        } else if (currentViewIndex === 1) {
+          // If we're at the blue box view, start showing colored boxes one by one
+          if (transitionPhase === 0) {
+            setTransitionPhase(1);
+            setShowColoredBoxes(prev => ({ ...prev, orange: true }));
+          } else if (transitionPhase === 1) {
+            setTransitionPhase(2);
+            setShowColoredBoxes(prev => ({ ...prev, cyan: true }));
+          } else if (transitionPhase === 2) {
+            setTransitionPhase(3);
+            setShowColoredBoxes(prev => ({ ...prev, yellow: true }));
+          } else if (transitionPhase === 3) {
+            // Once all colored boxes are shown, move to the grid view
+            setCurrentViewIndex(2);
+            setTransitionPhase(0);
+          }
+        }
+      } else if (e.deltaY < 0) {
+        // Scrolling up
+        if (currentViewIndex === 2) {
+          // From grid to colored boxes transition
+          setCurrentViewIndex(1);
+          setTransitionPhase(3);
+          setShowColoredBoxes({ orange: true, blue: true, cyan: true, yellow: true });
+        } else if (currentViewIndex === 1) {
+          if (transitionPhase === 3) {
+            setTransitionPhase(2);
+            setShowColoredBoxes(prev => ({ ...prev, yellow: false }));
+          } else if (transitionPhase === 2) {
+            setTransitionPhase(1);
+            setShowColoredBoxes(prev => ({ ...prev, cyan: false }));
+          } else if (transitionPhase === 1) {
+            setTransitionPhase(0);
+            setShowColoredBoxes({ orange: false, blue: false, cyan: false, yellow: false });
+          } else if (transitionPhase === 0) {
+            setCurrentViewIndex(0); // Go back to first view
+          }
+        }
+      }
+    };
+    
+    const touchStartHandler = (e: TouchEvent) => {
+      setTouchStart(e.touches[0].clientY);
+    };
+    
+    const touchMoveHandler = (e: TouchEvent) => {
+      if (isScrolling) return;
+      
+      const touchEnd = e.touches[0].clientY;
+      const diff = touchStart - touchEnd;
+      
+      if (Math.abs(diff) > 30) {
+        setIsScrolling(true);
+        setTimeout(() => setIsScrolling(false), 400);
+        
+        if (diff > 0) {
+          // Swiping up (scrolling down)
+          if (currentViewIndex === 0) {
+            setCurrentViewIndex(1); // Go to blue box
+          } else if (currentViewIndex === 1) {
+            if (transitionPhase === 0) {
+              setTransitionPhase(1);
+              setShowColoredBoxes(prev => ({ ...prev, orange: true }));
+            } else if (transitionPhase === 1) {
+              setTransitionPhase(2);
+              setShowColoredBoxes(prev => ({ ...prev, cyan: true }));
+            } else if (transitionPhase === 2) {
+              setTransitionPhase(3);
+              setShowColoredBoxes(prev => ({ ...prev, yellow: true }));
+            } else if (transitionPhase === 3) {
+              setCurrentViewIndex(2);
+              setTransitionPhase(0);
+            }
+          }
+        } else if (diff < 0) {
+          // Swiping down (scrolling up)
+          if (currentViewIndex === 2) {
+            setCurrentViewIndex(1);
+            setTransitionPhase(3);
+            setShowColoredBoxes({ orange: true, blue: true, cyan: true, yellow: true });
+          } else if (currentViewIndex === 1) {
+            if (transitionPhase === 3) {
+              setTransitionPhase(2);
+              setShowColoredBoxes(prev => ({ ...prev, yellow: false }));
+            } else if (transitionPhase === 2) {
+              setTransitionPhase(1);
+              setShowColoredBoxes(prev => ({ ...prev, cyan: false }));
+            } else if (transitionPhase === 1) {
+              setTransitionPhase(0);
+              setShowColoredBoxes({ orange: false, blue: false, cyan: false, yellow: false });
+            } else if (transitionPhase === 0) {
+              setCurrentViewIndex(0);
+            }
+          }
+        }
+        
+        setTouchStart(touchEnd);
+      }
+    };
+    
+    // For keyboard navigation
     const keyHandler = (e: KeyboardEvent) => {
       if (isScrolling) return;
       
@@ -19,24 +140,261 @@ const HomePage = () => {
       setTimeout(() => setIsScrolling(false), 400);
       
       if (e.key === 'ArrowDown' || e.key === 'PageDown') {
-        setCurrentViewIndex(prev => Math.min(prev + 1, 2));
+        if (currentViewIndex === 0) {
+          setCurrentViewIndex(1);
+        } else if (currentViewIndex === 1) {
+          if (transitionPhase === 0) {
+            setTransitionPhase(1);
+            setShowColoredBoxes(prev => ({ ...prev, orange: true }));
+          } else if (transitionPhase === 1) {
+            setTransitionPhase(2);
+            setShowColoredBoxes(prev => ({ ...prev, cyan: true }));
+          } else if (transitionPhase === 2) {
+            setTransitionPhase(3);
+            setShowColoredBoxes(prev => ({ ...prev, yellow: true }));
+          } else if (transitionPhase === 3) {
+            setCurrentViewIndex(2);
+            setTransitionPhase(0);
+          }
+        }
       } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-        setCurrentViewIndex(prev => Math.max(prev - 1, 0));
+        if (currentViewIndex === 2) {
+          setCurrentViewIndex(1);
+          setTransitionPhase(3);
+          setShowColoredBoxes({ orange: true, blue: true, cyan: true, yellow: true });
+        } else if (currentViewIndex === 1) {
+          if (transitionPhase === 3) {
+            setTransitionPhase(2);
+            setShowColoredBoxes(prev => ({ ...prev, yellow: false }));
+          } else if (transitionPhase === 2) {
+            setTransitionPhase(1);
+            setShowColoredBoxes(prev => ({ ...prev, cyan: false }));
+          } else if (transitionPhase === 1) {
+            setTransitionPhase(0);
+            setShowColoredBoxes({ orange: false, blue: false, cyan: false, yellow: false });
+          } else if (transitionPhase === 0) {
+            setCurrentViewIndex(0);
+          }
+        }
       }
     };
     
+    window.addEventListener('wheel', wheelHandler, { passive: false });
+    window.addEventListener('touchstart', touchStartHandler);
+    window.addEventListener('touchmove', touchMoveHandler);
     window.addEventListener('keydown', keyHandler);
+    
     return () => {
+      window.removeEventListener('wheel', wheelHandler);
+      window.removeEventListener('touchstart', touchStartHandler);
+      window.removeEventListener('touchmove', touchMoveHandler);
       window.removeEventListener('keydown', keyHandler);
     };
-  }, [isScrolling]);
+  }, [isScrolling, touchStart, currentViewIndex, transitionPhase]);
 
   return (
     <div className="relative bg-white h-screen overflow-hidden" ref={containerRef}>
       <Header />
       
       <main className="h-screen w-screen">
-        {/* Final Brand Grid */}
+        {/* View 1: Initial Text */}
+        <AnimatePresence>
+          {currentViewIndex === 0 && (
+            <motion.section
+              key="initialView"
+              className="absolute inset-0 h-screen w-screen flex flex-col items-center justify-center px-4 text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                className="mb-6"
+              >
+                <svg width="48" height="48" viewBox="0 0 40 40" fill="#0061FE">
+                  <path d="M12.5 2.5L2.5 12.5V25L12.5 15V2.5Z" />
+                  <path d="M27.5 2.5L37.5 12.5V25L27.5 15V2.5Z" />
+                  <path d="M12.5 37.5L2.5 27.5V15L12.5 25V37.5Z" />
+                  <path d="M27.5 37.5L37.5 27.5V15L27.5 25V37.5Z" />
+                </svg>
+              </motion.div>
+              <motion.h1
+                className="text-4xl md:text-5xl font-bold mb-6 max-w-3xl"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              >
+                Dropbox Brand Assets
+              </motion.h1>
+              <motion.p
+                className="text-xl md:text-2xl text-gray-600 max-w-2xl"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+              >
+                Everything you need to represent Dropbox in your materials.
+              </motion.p>
+              
+              {/* Scroll indicator */}
+              <motion.div
+                className="absolute bottom-10 text-dropbox-blue"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, y: [0, 10, 0] }}
+                transition={{ 
+                  opacity: { delay: 1, duration: 0.5 },
+                  y: { repeat: Infinity, duration: 1.5 } 
+                }}
+              >
+                <p className="text-sm">Scroll to explore</p>
+                <div className="flex justify-center mt-2">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M7 13l5 5 5-5" />
+                    <path d="M7 7l5 5 5-5" />
+                  </svg>
+                </div>
+              </motion.div>
+            </motion.section>
+          )}
+        </AnimatePresence>
+        
+        {/* View 2: Blue Box and Transition */}
+        <AnimatePresence>
+          {currentViewIndex === 1 && (
+            <motion.section
+              key="blueBoxView"
+              className="absolute inset-0 h-screen w-screen flex flex-col items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="relative h-full w-full overflow-hidden">
+                <div className="absolute inset-0 bg-white">
+                  {/* Animated colored boxes in each corner */}
+                  <AnimatePresence>
+                    {showColoredBoxes.orange && (
+                      <motion.div
+                        className="absolute left-0 top-0 w-1/4 h-1/4 bg-[#FF7F32] rounded-lg"
+                        initial={{ x: -100, y: -100, opacity: 0 }}
+                        animate={{ x: 0, y: 0, opacity: 1 }}
+                        exit={{ x: -100, y: -100, opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  <AnimatePresence>
+                    {showColoredBoxes.blue && (
+                      <motion.div
+                        className="absolute right-0 top-0 w-1/4 h-1/4 bg-[#4ABFED] rounded-lg"
+                        initial={{ x: 100, y: -100, opacity: 0 }}
+                        animate={{ x: 0, y: 0, opacity: 1 }}
+                        exit={{ x: 100, y: -100, opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  <AnimatePresence>
+                    {showColoredBoxes.cyan && (
+                      <motion.div
+                        className="absolute right-0 bottom-0 w-1/4 h-1/4 bg-[#FF5D52] rounded-lg"
+                        initial={{ x: 100, y: 100, opacity: 0 }}
+                        animate={{ x: 0, y: 0, opacity: 1 }}
+                        exit={{ x: 100, y: 100, opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  <AnimatePresence>
+                    {showColoredBoxes.yellow && (
+                      <motion.div
+                        className="absolute left-0 bottom-0 w-1/4 h-1/4 bg-[#FFCC02] rounded-lg"
+                        initial={{ x: -100, y: 100, opacity: 0 }}
+                        animate={{ x: 0, y: 0, opacity: 1 }}
+                        exit={{ x: -100, y: 100, opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                      />
+                    )}
+                  </AnimatePresence>
+                  
+                  {/* Center Blue Box - Always present in this view */}
+                  <div className="absolute inset-0 flex items-center justify-center z-10">
+                    <motion.div
+                      className="bg-dropbox-blue text-white flex flex-col justify-between p-8 rounded-lg"
+                      style={{
+                        width: "min(520px, 80vw)",
+                        height: "min(520px, 80vh)",
+                        maxWidth: "calc(100% - 40px)",
+                        maxHeight: "calc(100% - 40px)"
+                      }}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ 
+                        scale: transitionPhase === 3 ? 0.9 : 0.5, 
+                        opacity: transitionPhase === 3 ? 0.5 : 0
+                      }}
+                      transition={{ 
+                        duration: 0.5,
+                        type: "spring",
+                        stiffness: 200
+                      }}
+                      layoutId={transitionPhase === 3 ? "color-card" : undefined}
+                    >
+                      <motion.h2
+                        className="text-xl md:text-2xl font-bold"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2, duration: 0.5 }}
+                      >
+                        From icons to illustration, logos to language, this collection is the foundation for how Dropbox looks, feels, and sounds like Dropbox.
+                      </motion.h2>
+                      
+                      <motion.div
+                        className="mt-auto flex justify-end"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.4, duration: 0.5 }}
+                      >
+                        <svg width="32" height="32" viewBox="0 0 40 40" fill="white">
+                          <path d="M12.5 2.5L2.5 12.5V25L12.5 15V2.5Z" />
+                          <path d="M27.5 2.5L37.5 12.5V25L27.5 15V2.5Z" />
+                          <path d="M12.5 37.5L2.5 27.5V15L12.5 25V37.5Z" />
+                          <path d="M27.5 37.5L37.5 27.5V15L27.5 25V37.5Z" />
+                        </svg>
+                      </motion.div>
+                    </motion.div>
+                  </div>
+                </div>
+                
+                {/* Scroll indicator */}
+                <motion.div
+                  className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-dropbox-blue"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1, y: [0, 10, 0] }}
+                  transition={{ 
+                    opacity: { delay: 1, duration: 0.5 },
+                    y: { repeat: Infinity, duration: 1.5 } 
+                  }}
+                >
+                  <p className="text-sm">Continue scrolling</p>
+                  <div className="flex justify-center mt-2">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M7 13l5 5 5-5" />
+                      <path d="M7 7l5 5 5-5" />
+                    </svg>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.section>
+          )}
+        </AnimatePresence>
+        
+        {/* View 3: Final Brand Grid */}
         <AnimatePresence>
           {currentViewIndex === 2 && (
             <motion.section
@@ -130,6 +488,7 @@ const HomePage = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
                     whileHover={{ scale: 0.98 }}
+                    layoutId="color-card"
                   >
                     <h3 className="text-xl font-bold">Color</h3>
                     <div className="flex-1 flex items-end justify-end">
