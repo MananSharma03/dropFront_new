@@ -670,11 +670,15 @@ const HomePage = () => {
                   
                   {/* Center Blue Box - Always present in this view */}
                   <motion.div
-                    className="bg-dropbox-blue text-white col-span-4 row-span-4 col-start-5 row-start-2 flex flex-col justify-between p-6"
+                    className="bg-dropbox-blue text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[520px] h-[520px] flex flex-col justify-between p-6"
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.5, opacity: 0 }}
                     transition={{ duration: 0.5 }}
+                    style={{
+                      gridColumn: "2 / span 2",
+                      gridRow: "2 / span 2",
+                    }}
                   >
                     <motion.h2
                       className="text-xl md:text-2xl font-bold"
@@ -736,7 +740,7 @@ const HomePage = () => {
               transition={{ duration: 0.3 }}
             >
               {/* Exact grid layout matching the final screenshot */}
-              <div className="h-screen w-screen p-0 m-0" 
+              <div className="h-screen w-screen flex items-center justify-center" 
                    style={{
                      display: "grid",
                      gridTemplateColumns: "260px 520px 260px 260px",
@@ -747,13 +751,14 @@ const HomePage = () => {
                        "iconography color color motion"
                        "iconography imagery imagery imagery"
                      `,
-                     gap: "0px"
+                     gap: "5px",
+                     backgroundColor: "#ffffff"
                    }}>
                 
                 {/* Framework Card */}
                 <Link href="/#framework" className="block" style={{ gridArea: "framework" }}>
                   <motion.div 
-                    className="bg-[#2D3748] text-white h-full w-full p-6 flex flex-col"
+                    className="bg-[#2D3748] text-white h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5 }}
@@ -775,7 +780,7 @@ const HomePage = () => {
                 {/* Voice & Tone Card */}
                 <Link href="/#voice-tone" className="block" style={{ gridArea: "voice" }}>
                   <motion.div 
-                    className="bg-[#FFCC02] text-[#553611] h-full w-full p-6 flex flex-col"
+                    className="bg-[#FFCC02] text-[#553611] h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, y: -50 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
@@ -792,7 +797,7 @@ const HomePage = () => {
                 {/* Logo Card */}
                 <Link href="/#logo" className="block" style={{ gridArea: "logo" }}>
                   <motion.div 
-                    className="bg-[#4ABFED] text-white h-full w-full p-6 flex flex-col"
+                    className="bg-[#4ABFED] text-white h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
@@ -813,7 +818,7 @@ const HomePage = () => {
                 {/* Color Card */}
                 <Link href="/#color" className="block" style={{ gridArea: "color" }}>
                   <motion.div 
-                    className="bg-[#FF7F32] text-[#4A2400] h-full w-full p-6 flex flex-col"
+                    className="bg-[#FF7F32] text-[#4A2400] h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
@@ -832,7 +837,7 @@ const HomePage = () => {
                 {/* Typography Card */}
                 <Link href="/#typography" className="block" style={{ gridArea: "typography" }}>
                   <motion.div 
-                    className="bg-[#FF5D52] text-[#4A1A16] h-full w-full p-6 flex flex-col"
+                    className="bg-[#FF5D52] text-[#4A1A16] h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 0.3 }}
@@ -848,7 +853,7 @@ const HomePage = () => {
                 {/* Iconography Card */}
                 <Link href="/#iconography" className="block" style={{ gridArea: "iconography" }}>
                   <motion.div 
-                    className="bg-[#A2CD3A] text-[#2D3748] h-full w-full p-6 flex flex-col"
+                    className="bg-[#A2CD3A] text-[#2D3748] h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 0.3 }}
@@ -868,7 +873,7 @@ const HomePage = () => {
                 {/* Motion Card */}
                 <Link href="/#motion" className="block" style={{ gridArea: "motion" }}>
                   <motion.div 
-                    className="bg-[#C881F2] text-[#3F185C] h-full w-full p-6 flex flex-col"
+                    className="bg-[#C881F2] text-[#3F185C] h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 0.4 }}
