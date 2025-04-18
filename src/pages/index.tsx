@@ -6,34 +6,34 @@ import Footer from '@/components/Layout/Footer';
 
 const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [currentViewIndex, setCurrentViewIndex] = useState(0); // Start with first view
+  const [currentViewIndex, setCurrentViewIndex] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
   const [transitionPhase, setTransitionPhase] = useState(0);
-  
-  // For the intermediate view with appearing colored boxes
+
+
   const [showColoredBoxes, setShowColoredBoxes] = useState({
     orange: false,
     blue: false,
     cyan: false,
     yellow: false,
   });
-  
-  // Scroll and wheel event handlers
+
+
   useEffect(() => {
     const wheelHandler = (e: WheelEvent) => {
       if (isScrolling) return;
       e.preventDefault();
-      
+
       setIsScrolling(true);
       setTimeout(() => setIsScrolling(false), 400);
-      
+
       if (e.deltaY > 0) {
-        // Scrolling down
+
         if (currentViewIndex === 0) {
-          setCurrentViewIndex(1); // Go to blue box
+          setCurrentViewIndex(1);
         } else if (currentViewIndex === 1) {
-          // If we're at the blue box view, start showing colored boxes one by one
+
           if (transitionPhase === 0) {
             setTransitionPhase(1);
             setShowColoredBoxes(prev => ({ ...prev, orange: true }));
@@ -44,15 +44,15 @@ const HomePage = () => {
             setTransitionPhase(3);
             setShowColoredBoxes(prev => ({ ...prev, yellow: true }));
           } else if (transitionPhase === 3) {
-            // Once all colored boxes are shown, move to the grid view
+
             setCurrentViewIndex(2);
             setTransitionPhase(0);
           }
         }
       } else if (e.deltaY < 0) {
-        // Scrolling up
+
         if (currentViewIndex === 2) {
-          // From grid to colored boxes transition
+
           setCurrentViewIndex(1);
           setTransitionPhase(3);
           setShowColoredBoxes({ orange: true, blue: true, cyan: true, yellow: true });
@@ -67,30 +67,30 @@ const HomePage = () => {
             setTransitionPhase(0);
             setShowColoredBoxes({ orange: false, blue: false, cyan: false, yellow: false });
           } else if (transitionPhase === 0) {
-            setCurrentViewIndex(0); // Go back to first view
+            setCurrentViewIndex(0);
           }
         }
       }
     };
-    
+
     const touchStartHandler = (e: TouchEvent) => {
       setTouchStart(e.touches[0].clientY);
     };
-    
+
     const touchMoveHandler = (e: TouchEvent) => {
       if (isScrolling) return;
-      
+
       const touchEnd = e.touches[0].clientY;
       const diff = touchStart - touchEnd;
-      
+
       if (Math.abs(diff) > 30) {
         setIsScrolling(true);
         setTimeout(() => setIsScrolling(false), 400);
-        
+
         if (diff > 0) {
-          // Swiping up (scrolling down)
+
           if (currentViewIndex === 0) {
-            setCurrentViewIndex(1); // Go to blue box
+            setCurrentViewIndex(1);
           } else if (currentViewIndex === 1) {
             if (transitionPhase === 0) {
               setTransitionPhase(1);
@@ -107,7 +107,7 @@ const HomePage = () => {
             }
           }
         } else if (diff < 0) {
-          // Swiping down (scrolling up)
+
           if (currentViewIndex === 2) {
             setCurrentViewIndex(1);
             setTransitionPhase(3);
@@ -127,18 +127,18 @@ const HomePage = () => {
             }
           }
         }
-        
+
         setTouchStart(touchEnd);
       }
     };
-    
-    // For keyboard navigation
+
+
     const keyHandler = (e: KeyboardEvent) => {
       if (isScrolling) return;
-      
+
       setIsScrolling(true);
       setTimeout(() => setIsScrolling(false), 400);
-      
+
       if (e.key === 'ArrowDown' || e.key === 'PageDown') {
         if (currentViewIndex === 0) {
           setCurrentViewIndex(1);
@@ -178,12 +178,12 @@ const HomePage = () => {
         }
       }
     };
-    
+
     window.addEventListener('wheel', wheelHandler, { passive: false });
     window.addEventListener('touchstart', touchStartHandler);
     window.addEventListener('touchmove', touchMoveHandler);
     window.addEventListener('keydown', keyHandler);
-    
+
     return () => {
       window.removeEventListener('wheel', wheelHandler);
       window.removeEventListener('touchstart', touchStartHandler);
@@ -195,7 +195,7 @@ const HomePage = () => {
   return (
     <div className="relative bg-white h-screen overflow-hidden" ref={containerRef}>
       <Header />
-      
+
       <main className="h-screen w-screen">
         {/* View 1: Initial Text */}
         <AnimatePresence>
@@ -237,15 +237,15 @@ const HomePage = () => {
               >
                 Everything you need to represent Dropbox in your materials.
               </motion.p>
-              
+
               {/* Scroll indicator */}
               <motion.div
                 className="absolute bottom-10 text-dropbox-blue"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1, y: [0, 10, 0] }}
-                transition={{ 
+                transition={{
                   opacity: { delay: 1, duration: 0.5 },
-                  y: { repeat: Infinity, duration: 1.5 } 
+                  y: { repeat: Infinity, duration: 1.5 }
                 }}
               >
                 <p className="text-sm">Scroll to explore</p>
@@ -259,7 +259,7 @@ const HomePage = () => {
             </motion.section>
           )}
         </AnimatePresence>
-        
+
         {/* View 2: Blue Box and Transition */}
         <AnimatePresence>
           {currentViewIndex === 1 && (
@@ -321,7 +321,7 @@ const HomePage = () => {
                       />
                     )}
                   </AnimatePresence>
-                  
+
                   {/* Center Blue Box - Always present in this view */}
                   <div className="absolute inset-0 flex items-center justify-center z-10">
                     <motion.div
@@ -334,11 +334,11 @@ const HomePage = () => {
                       }}
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
-                      exit={{ 
-                        scale: transitionPhase === 3 ? 0.9 : 0.5, 
+                      exit={{
+                        scale: transitionPhase === 3 ? 0.9 : 0.5,
                         opacity: transitionPhase === 3 ? 0.5 : 0
                       }}
-                      transition={{ 
+                      transition={{
                         duration: 0.5,
                         type: "spring",
                         stiffness: 200
@@ -353,7 +353,7 @@ const HomePage = () => {
                       >
                         From icons to illustration, logos to language, this collection is the foundation for how Dropbox looks, feels, and sounds like Dropbox.
                       </motion.h2>
-                      
+
                       <motion.div
                         className="mt-auto flex justify-end"
                         initial={{ opacity: 0 }}
@@ -370,15 +370,15 @@ const HomePage = () => {
                     </motion.div>
                   </div>
                 </div>
-                
+
                 {/* Scroll indicator */}
                 <motion.div
                   className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-dropbox-blue"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1, y: [0, 10, 0] }}
-                  transition={{ 
+                  transition={{
                     opacity: { delay: 1, duration: 0.5 },
-                    y: { repeat: Infinity, duration: 1.5 } 
+                    y: { repeat: Infinity, duration: 1.5 }
                   }}
                 >
                   <p className="text-sm">Continue scrolling</p>
@@ -393,7 +393,7 @@ const HomePage = () => {
             </motion.section>
           )}
         </AnimatePresence>
-        
+
         {/* View 3: Final Brand Grid */}
         <AnimatePresence>
           {currentViewIndex === 2 && (
@@ -404,7 +404,7 @@ const HomePage = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="h-screen w-screen absolute inset-0" 
+              <div className="h-screen w-screen absolute inset-0"
                 style={{
                   display: "grid",
                   gridTemplateColumns: "1fr 2fr 1fr 1fr",
@@ -419,15 +419,22 @@ const HomePage = () => {
                   padding: "12px",
                   backgroundColor: "#ffffff"
                 }}>
-                
+
                 {/* Framework Card */}
                 <Link href="/#framework" className="block" style={{ gridArea: "framework" }}>
-                  <motion.div 
+                  <motion.div
                     className="bg-[#2D3748] text-white h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5 }}
                     whileHover={{ scale: 0.98 }}
+                    style={{  
+                      height: "100%",
+                      width: "100%",
+                      paddingTop: "100px",
+                      paddingBottom: "0",
+                      clipPath: "inset(14.5% 0 0 0 round 8px 8px 0 0)",
+                    }}
                   >
                     <h3 className="text-xl font-bold">Framework</h3>
                     <div className="flex-1 flex items-center justify-center">
@@ -441,15 +448,22 @@ const HomePage = () => {
                     </div>
                   </motion.div>
                 </Link>
-                
+
                 {/* Voice & Tone Card */}
                 <Link href="/#voice-tone" className="block" style={{ gridArea: "voice" }}>
-                  <motion.div 
+                  <motion.div
                     className="bg-[#FFCC02] text-[#553611] h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, y: -50 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
                     whileHover={{ scale: 0.98 }}
+                    style={{
+                      height: "100%",
+                      width: "100%",
+                      paddingTop: "100px",
+                      paddingBottom: "0",
+                      clipPath: "inset(25% 0 0 0 round 8px 8px 0 0)",
+                    }}
                   >
                     <h3 className="text-xl font-bold">Voice & Tone</h3>
                     <div className="flex-1 flex items-center justify-between">
@@ -458,15 +472,22 @@ const HomePage = () => {
                     </div>
                   </motion.div>
                 </Link>
-                
+
                 {/* Logo Card */}
                 <Link href="/#logo" className="block" style={{ gridArea: "logo" }}>
-                  <motion.div 
+                  <motion.div
                     className="bg-[#4ABFED] text-white h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
                     whileHover={{ scale: 0.98 }}
+                    style={{
+                      height: "100%",
+                      width: "100%",
+                      paddingTop: "100px",
+                      paddingBottom: "0",
+                      clipPath: "inset(25% 0 0 0 round 8px 8px 0 0)",
+                    }}
                   >
                     <h3 className="text-xl font-bold">Logo</h3>
                     <div className="flex-1 flex items-center justify-center">
@@ -479,10 +500,10 @@ const HomePage = () => {
                     </div>
                   </motion.div>
                 </Link>
-                
+
                 {/* Color Card */}
                 <Link href="/#color" className="block" style={{ gridArea: "color" }}>
-                  <motion.div 
+                  <motion.div
                     className="bg-[#FF7F32] text-[#4A2400] h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -499,10 +520,10 @@ const HomePage = () => {
                     </div>
                   </motion.div>
                 </Link>
-                
+
                 {/* Typography Card */}
                 <Link href="/#typography" className="block" style={{ gridArea: "typography" }}>
-                  <motion.div 
+                  <motion.div
                     className="bg-[#FF5D52] text-[#4A1A16] h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -515,10 +536,10 @@ const HomePage = () => {
                     </div>
                   </motion.div>
                 </Link>
-                
+
                 {/* Iconography Card */}
                 <Link href="/#iconography" className="block" style={{ gridArea: "iconography" }}>
-                  <motion.div 
+                  <motion.div
                     className="bg-[#A2CD3A] text-[#2D3748] h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -535,10 +556,10 @@ const HomePage = () => {
                     </div>
                   </motion.div>
                 </Link>
-                
+
                 {/* Motion Card */}
                 <Link href="/#motion" className="block" style={{ gridArea: "motion" }}>
-                  <motion.div 
+                  <motion.div
                     className="bg-[#C881F2] text-[#3F185C] h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -551,14 +572,14 @@ const HomePage = () => {
                         <motion.path
                           d="M10,10 C30,5 40,20 50,10 C55,30 40,50 50,50 C30,55 20,40 10,50 C5,30 20,10 10,10"
                           initial={{ pathLength: 0 }}
-                          animate={{ 
+                          animate={{
                             pathLength: [0, 1, 0],
-                            pathOffset: [0, 0, 1] 
+                            pathOffset: [0, 0, 1]
                           }}
-                          transition={{ 
-                            duration: 5, 
+                          transition={{
+                            duration: 5,
                             repeat: Infinity,
-                            repeatType: "loop" 
+                            repeatType: "loop"
                           }}
                         />
                         <circle cx="10" cy="10" r="3" fill="currentColor" />
@@ -569,15 +590,24 @@ const HomePage = () => {
                     </div>
                   </motion.div>
                 </Link>
-                
+
                 {/* Imagery Card */}
                 <Link href="/#imagery" className="block" style={{ gridArea: "imagery" }}>
-                  <motion.div 
+                  <motion.div
                     className="bg-[#9C366B] text-white h-full w-full p-6 flex flex-col rounded-lg"
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.4 }}
                     whileHover={{ scale: 0.98 }}
+                    style={{
+                      height: "100%",
+                      width: "100%",
+                      boxSizing: "border-box",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      overflow: "hidden",
+                    }}
                   >
                     <h3 className="text-xl font-bold">Imagery</h3>
                     <div className="flex-1 flex items-center justify-center">
